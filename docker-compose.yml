@@ -1,0 +1,39 @@
+version: '3'
+services:
+  orderservice:
+    build:
+      context: ./orderservice
+      dockerfile: Dockerfile
+      args:
+        artifactid: orderservice 
+        version: 0.0.1
+    image: tveauvy/orderservice_monolith
+    container_name: orderservice_monolith
+    ports: 
+      - "8080:8080" 
+    environment:
+      - DB_URL=jdbc:postgresql://${POSTGRES_HOST}/${POSTGRES_DB}
+      - DB_USERNAME=${POSTGRES_USER}
+      - DB_PASSWORD=${POSTGRES_PASSWORD}
+    # for dev purposes only
+    volumes:
+      - /home/vtoclock/.m2:/root/.m2
+    networks:
+      - backend
+  pgdb:
+    build: ./pgdb
+    image: tveauvy/orderservice_pgdb
+    container_name: orderservice_pgdb
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
+    # for testing purposes only
+    # volumes:
+      # - ./data:/data
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge

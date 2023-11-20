@@ -1,0 +1,35 @@
+sudo: required
+dist: trusty
+language: java
+node_js:
+  - "12.22.9"
+
+install:
+  - npm install newman
+
+services:
+  - docker
+
+addons:
+  sonarcloud:
+    organization: "interview"
+    token:
+      secure: "OSOnRh8NXuu+QVFFmn8t6RtXsKEvHcJJGvHJG7RhDSfWa8BGJWAKLbRhJphBfgxLyVTBmK1JY3dSv8elfWR7Ypbc3LozWCkQSWOKwMS2T7f3si3Ful9VOfFOA5bxg8DlafYVVh8LDgpobVADMhj6jsXkwN/VSxE3jZpE8hnnTXgDTOasWTE2/FVJ1yOaERTCO3WVTDEF8iHPSrbUrLVt7Ir6tIgkVgZOwsTBCxcb57sf+TCYWmn0tmBLjYXhCpKI2z6gRU7CmUdI9mX96qyMeh2LtXjWQdoC1a/RNCkBzDNjJJfwR+2MiMY/PXOhafKEsTP+8WV6KZJGicHTJ2MPksauesMRHPtrxx/SPekhHctmV9fcq+o5kyOwv/giXkb82eAYiBdUl9TJXIF28hXszFtlsExOLOurOzseV3Tgky3ZCHTlRPpgQ3UMR1HO7+1UcchPNuFrEGbwTZxHqitPAPUpyq6SMYv4x9sPZiR2wmhI7h6JRH+4TuhYCnq2FpX/yQ5vv9MhvgcjGZ1VqBu7u27LEFTwnjj8cwHJuO73znvW0VRKCU+kewLisqyyX0nkqPyjfBL1VtczDKZBTV50GU7aOcwxtMxWtH34OXZj+kNeM/sg2HbLI2jj+Eq2vh23+ITQrl8QRsb3qrdVgarHhujP0A76tsiHqyWffShu27g="
+
+env:
+  DOCKER_COMPOSE_VERSION: 2.21.0
+
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+before_script:
+  - docker-compose up -d --build
+
+script:
+  - sonar-scanner
+
+after_script:
+  - docker-compose down
